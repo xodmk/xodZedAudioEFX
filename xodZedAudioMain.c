@@ -57,9 +57,6 @@ AudioFile<float>* wavSub 			-
 stereoData_t x_in[] 				-
 stereoData_t y_out[] 				-
 
-
-
-
 *---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%---*/
 
 /*------------------------------------------------------------------------------------------------*/
@@ -86,112 +83,6 @@ stereoData_t y_out[] 				-
 
 #include "oledrgb_pattern1.h"
 #include "PmodOLEDrgb.h"
-
-
-/*------------------------------------------------------------------------------------------------*/
-/* (((User Definitions))) */
-
-#define MAXCHANNELS 4
-#define MAXDELAY 16384
-#define LFOCHANNELS 1
-
-/*------------------------------------------------------------------------------------------------*/
-/* (((Definitions))) */
-
-#define bool u8
-#define true 1
-#define false 0
-
-//#define printf xil_printf							/* smaller, optimised printf !!?doesn't allow for %d variables?!?*/
-
-#define BTN_CH_MASK		XGPIO_IR_CH1_MASK
-#define BTN0_CH_MASK	XGPIO_IR_CH1_MASK
-#define SWS_CH_MASK		XGPIO_IR_CH2_MASK
-#define TIMER_INT		XGPIO_IR_CH1_MASK
-#define ROTARY_INT		XGPIO_IR_CH1_MASK
-
-//#define LED 0xC3									/* Initial LED value - XX0000XX */
-#define LED 0x01									/* Initial LED value - XX0000XX */
-#define LED_DELAY		15600000					/* Software delay length */
-#define LED_CHANNEL		1							/* GPIO port for LEDs */
-#define SW_CHANNEL		2							/* GPIO port for SWs */
-
-/*------------------------------------------------------------------------------------------------*/
-/* Device IDs */
-
-//#define Snoop Control Unit (interrupt controller)
-#define INTC_DEVICE_ID 				XPAR_PS7_SCUGIC_0_DEVICE_ID
-
-//#define Timer
-//#define TMRCTR_TIMER_ID				XPAR_AXI_TIMER_0_DEVICE_ID
-//#define INTC_TIMER_INTERRUPT_ID	  XPAR_FABRIC_AXI_TIMER_0_INTERRUPT_INTR
-
-//#define timer0 DEVICE_ID
-//#define GPIO_TIMER0_ID 				XPAR_AXIGPIO_TIMER0_DEVICE_ID
-
-//#define AXICTRL_DEVICE_ID (built-in)
-#define AXI_CTRL_ID  				XPAR_XODEFX_TOP_DEVICE_ID
-
-//#define BTNS_DEVICE_ID (built-in)
-#define GPIO_BTNS_ID  				XPAR_AXIGPIO_BTNS_DEVICE_ID
-#define INTC_BTNS_INTERRUPT_ID 		XPAR_FABRIC_AXIGPIO_BTNS_IP2INTC_IRPT_INTR
-
-//#define BTN0_DEVICE_ID (Pmod)
-//#define GPIO_BTN0x1_ID  			XPAR_AXIGPIO13_BTN0_DEVICE_ID
-//#define INTC_BTN0x1_INTERRUPT_ID 	XPAR_FABRIC_AXIGPIO13_BTN0_IP2INTC_IRPT_INTR
-
-
-//#define ROTARY1_DEVICE_ID
-#define GPIO_ROTARY1_ID				XPAR_AXIGPIO_ROT1_DEVICE_ID
-#define INTC_ROTARY1_INTERRUPT_ID 	XPAR_FABRIC_AXIGPIO_ROT1_IP2INTC_IRPT_INTR
-
-//#define ROTARY2_DEVICE_ID
-#define GPIO_ROTARY2_ID				XPAR_AXIGPIO_ROT2_DEVICE_ID
-#define INTC_ROTARY2_INTERRUPT_ID 	XPAR_FABRIC_AXIGPIO_ROT2_IP2INTC_IRPT_INTR
-
-//#define ROTARY3_DEVICE_ID
-#define GPIO_ROTARY3_ID				XPAR_AXIGPIO_ROT3_DEVICE_ID
-#define INTC_ROTARY3_INTERRUPT_ID 	XPAR_FABRIC_AXIGPIO_ROT3_IP2INTC_IRPT_INTR
-
-//#define ROTARY4_DEVICE_ID
-#define GPIO_ROTARY4_ID				XPAR_AXIGPIO_ROT4_DEVICE_ID
-#define INTC_ROTARY4_INTERRUPT_ID 	XPAR_FABRIC_AXIGPIO_ROT4_IP2INTC_IRPT_INTR
-
-//#define LEDS_SWS_DEVICE_ID
-// DUAL: ?LSB[7:0]=LED, MSB[7:0]=SW
-#define GPIO_LED_SW_ID  			XPAR_AXIGPIO_LEDSW_DEVICE_ID
-
-//#define DDLCTRL_DEVICE_ID
-#define GPIO_DDLCTRL_ID 			XPAR_AXIGPIO_DDLCTRL_DEVICE_ID
-
-//#define VOLCTRL_DEVICE_ID
-#define GPIO_VOLWSGAIN_ID 			XPAR_AXIGPIO_VOLWSGAIN_DEVICE_ID
-
-//#define OSC4T Freq2 & PWM DEVICE_ID (dual channel)
-// DUAL: LSB[27:0]=DDS FREQ2, MSB[27:0]=PWM FREQ
-//#define GPIO_OSCF2_PWM_ID 			XPAR_AXIGPIO7_FREQ2PWM_DEVICE_ID
-
-//#define AUDIOMUX_DEVICE_ID
-//#define GPIO_AUDIOMUX_ID 			XPAR_AXIGPIO9_MUXCTRL_DEVICE_ID
-
-//#define MHL_ALPHA_K_DEVICE_ID
-// DUAL: LSB[27:0]=ALPHA (G - cutoff), MSB[27:0]=K (resonance)
-//#define GPIO_MHL_ALPHA_K_ID 		XPAR_AXIGPIO10_ALPHAK_DEVICE_ID
-
-//#define MHL_PARAM1_DEVICE_ID
-// DUAL: LSB[23:0]=ALPHA0, MSB[23:0]=Beta1
-//#define GPIO_MHL_PARAM1_ID 			XPAR_AXIGPIO11_FPARAMS1_DEVICE_ID
-
-//#define MHL_PARAM2_DEVICE_ID
-// DUAL: LSB[23:0]=Beta2, MSB[23:0]=Beta3
-//#define GPIO_MHL_PARAM2_ID 			XPAR_AXIGPIO12_FPARAMS2_DEVICE_ID
-
-//#define SEMALPHA_DEVICE_ID
-// DUAL: LSB[23:0]=alpha0, MSB[23:0]=alpha
-//#define GPIO_SEMALPHA_ID 			XPAR_AXIGPIO16_SEMALPHA_DEVICE_ID
-
-//#define SEMRHO_DEVICE_ID
-//#define GPIO_SEMRHO_ID 				XPAR_AXIGPIO17_SEMRHO_DEVICE_ID
 
 
 /*------------------------------------------------------------------------------------------------*/
@@ -224,23 +115,48 @@ XXodefx_top XodAXICtrl;
 /*------------------------------------------------------------------------------------------------*/
 /* prototype EFX controls */
 
+char efxTestName[] = "Mumra_was_here";
+// const std::string efxTestName = "Mumra_was_here";
+// const std::string &outDir
 
-const std::string efxTestName = "mumra_was_here";
-// const std::string &outDir 			-
+//const u32 			MAXDELAY = 16384; 					// ap_uint<16,8> delay_t;
+//const u32 maxDlyLength = 65535<<8; 			// ap_uint<16,8> delay_t;
+
+
+static float 		volCtrlDB = 25.2;		// Attenuation amount: 0 DB = full volume, -140 DB ~ -inf
+static u32 			volCtrlVal = 3601;		// 16b exponential audio out volume control val { 0 - 32767 }, default = 16422 (-6 DB)
+
+static float 		delayBase = 777;
+static float 		ddlTilt = 0;
+static bool 		ddlCenterLock = 1;
+
+static float 		freqBase = 56.6;
+static float 		ssbTilt = 0;
+static bool			ssbCenterLock = 1;
 
 
 ///// DDL controls /////
-const float ddlWetDryScale = 0.023;
-//const u32 ddlLengthScale = 56<<8;
-const u32 ddlLengthScaleBase = 128;				// default base scale (pre-scaled scaler)
-const float ddlFbGainScale = 0.023;
-const unsigned int ddlCtrlBwidth = 16;			// ap_ufixed<16,8>
-const u32 maxDlyLength = 65535<<8; 				// ap_uint<16,8> delay_t;
+static float 		ddlWetDryScale = 0.023;
+//static u32 			ddlLengthScaleBase = 128;				// default base scale (pre-scaled scaler)
+static float 		ddlFbGainScale = 0.023;
 
+// *--------------------------------------------------------------------------------* //
+/////  __ssbModFreqCtrl__ SSB, DDS controls /////
 
-///// DDS controls /////
-const int ddsPhaseWidth = 36;
+	// +/-1499 Hz max/min freq ssbOsc CTRL UI (ddsCtrl_t = 32bits)
+	// (-1499 * (2**36 / 48000) = -2146051992  =>  2**31 - 1 = 2147483647 (1500 overflows 32 bits)
+	// assert(ssbModFreqCTRL.ssbFreqBase + (abs(ssbModFreqCTRL.ssbTilt)) <= 1499);
+	// assert(ssbModFreqCTRL.ssbFreqBase - (abs(ssbModFreqCTRL.ssbTilt)) >= -1499);
 
+//ddsFreq4CHAXI_t* ssbModFreq = NULL;
+//struct ddsFreq4CHAXI_t *ssbModFreq = malloc(sizeof(struct ddsFreq4CHAXI_t));
+//
+//ssbModFreq->ddsFreqCtrlCH1 = ssbModFreqArray[0];
+//ssbModFreq->ddsFreqCtrlCH2 = ssbModFreqArray[1];
+//ssbModFreq->ddsFreqCtrlCH3 = ssbModFreqArray[2];
+//ssbModFreq->ddsFreqCtrlCH4 = ssbModFreqArray[3];
+
+// *--------------------------------------------------------------------------------* //
 
 // // waveshaper Gain ctrl: ap_ufixed<16,10>
 // //Atan exponent" - range {0.1 - 1024.0}, initial value = 1.0
@@ -257,6 +173,8 @@ const float wsGainScale = 0.46;
 //const int semCutoffScale = 111;
 //const float semQScale = 0.007;
 
+
+const unsigned int  ddlCtrlBwidth = 16;			// ap_ufixed<16,8>
 
 /*------------------------------------------------------------------------------------------------*/
 /* (((Static Variables))) */
@@ -292,27 +210,19 @@ static u8 rotary3_AB = 0;
 static u8 rotary4_AB = 0;
 
 
-static float volCtrlDB = 25.2;		// Attenuation amount: 0 DB = full volume, -140 DB ~ -inf
-static u32 volCtrlVal = 3601;		// 16b exponential audio out volume control val { 0 - 32767 }, default = 16422 (-6 DB)
 
-static float delayBase = 777;
-static float freqBase = 56.6;
+static union ddlLengthCtrl_u *ddlLengthCtrlData;
+static union ssbModFreqCtrl_u *ssbModFreqCtrlData;
 
-static float ddlTilt = 0;
-static float ssbTilt = 0;
-
-static bool ddlCenterLock = 1;
-static bool ssbCenterLock = 1;
-
-//static union ddlLengthCtrl_u ddlLenCtrlUnion;
-
+/*------------------------------------------------------------------------------------------------*/
+// AXI Bus aggregates
 
 //typedef struct {
 //	    u32 word_0;
 //	    u32 word_1;
 //	    u32 word_2;
 //	} XXodefx_top_Ddllengthctrl;
-static XXodefx_top_Ddllengthctrl* ddlLenCtrlAxiBus;
+static XXodefx_top_Ddllengthctrl ddlLenCtrlAxiBus;
 
 //		typedef struct {
 //		    u32 word_0;
@@ -320,9 +230,9 @@ static XXodefx_top_Ddllengthctrl* ddlLenCtrlAxiBus;
 //		    u32 word_2;
 //		    u32 word_3;
 //		} XXodefx_top_Ssbmodfreqctrl;
-static XXodefx_top_Ssbmodfreqctrl* ssbModPhaseAxiBus;
+static XXodefx_top_Ssbmodfreqctrl ssbModPhaseAxiBus;
 
-/*------------------------------------------------------------------------------------------------*/
+
 /*------------------------------------------------------------------------------------------------*/
 // define DDL CTRL parameters
 
@@ -331,38 +241,43 @@ static float ddlWetMixFloat = 0.5;
 static float ddlFBGainFloat = 0;
 
 
-
-//static u32 ddlLengthShift;
-static u32 delayLengthTmp = 450688;		// range = 0 - ap_ufixed<16,8> (ex. 1760.5 << 8 = 450688)
-
 static u32 ddlLengthScale = 1;
 static u32 ddlTiltScale = 0.1;
 
-// DDL CH1
-struct DDLCTRL1_type {
-	u16 wetMix: 16;						// range = 0.0:1.0 <-> ap_ufixed<16, 1> delayCtrl_t
-	u16 feedbackGain: 16;				// range = 0.0:1.0 <-> ap_ufixed<16, 1> delayCtrl_t
-};
-
-union DDLCTRL1_u {
-	u32 DDLCTRL_CH1Val;
-	struct DDLCTRL1_type DDLCTRL1;
-};
-
-static union DDLCTRL1_u DDLCTRL1Union;
 
 
-// DDL CH2
-struct DDLCTRL2_type {
-	u32 delayLength: 24;			// range = 0 - ap_ufixed<16,8> (ex. 1760.5 << 8 = 450688)
-};
+//// DDL CH1
+//struct DDLCTRL1_type {
+//	u16 wetMix: 16;						// range = 0.0:1.0 <-> ap_ufixed<16, 1> delayCtrl_t
+//	u16 feedbackGain: 16;				// range = 0.0:1.0 <-> ap_ufixed<16, 1> delayCtrl_t
+//};
+//
+//union DDLCTRL1_u {
+//	u32 DDLCTRL_CH1Val;
+//	struct DDLCTRL1_type DDLCTRL1;
+//};
+//
+//static union DDLCTRL1_u DDLCTRL1Union;
+//
+//
+//// DDL CH2
+//struct DDLCTRL2_type {
+//	u32 delayLength: 24;			// range = 0 - ap_ufixed<16,8> (ex. 1760.5 << 8 = 450688)
+//};
+//
+//union DDLCTRL2_u {
+//	u32 DDLCTRL_CH2Val;
+//	struct DDLCTRL2_type DDLCTRL2;
+//};
+//
+//static union DDLCTRL2_u DDLCTRL2Union;
 
-union DDLCTRL2_u {
-	u32 DDLCTRL_CH2Val;
-	struct DDLCTRL2_type DDLCTRL2;
-};
 
-static union DDLCTRL2_u DDLCTRL2Union;
+/*------------------------------------------------------------------------------------------------*/
+//  __SSB - Single Side-Band Modulator__
+
+//static int ssbSetStepVal = 11000093;	// SSM Modulation frequency
+static int ssbFreqScale = 0.01;
 
 /*------------------------------------------------------------------------------------------------*/
 
@@ -377,12 +292,6 @@ static float wsGainFloat = 1.7;
 static u32 wsGainVal = 1.7 * 64;	// waveshaper Gain ctrl: ap_ufixed<16,10> - range { 0.25 - 1023 }
 
 /*------------------------------------------------------------------------------------------------*/
-
-
-union sws_u {
-	u32 swValue;
-	struct switch_t switches;
-};
 
 static union sws_u swsUnion;
 
@@ -490,11 +399,6 @@ fmVol_V				[11:0]
 
 */
 
-/*------------------------------------------------------------------------------------------------*/
-//  __SSB - Single Side-Band Modulator__
-
-static int ssbSetStepVal = 11000093;	// SSM Modulation frequency
-
 
 /*------------------------------------------------------------------------------------------------*/
 // define struct for Moog Half-Ladder Filter parameters
@@ -560,9 +464,12 @@ void volCtrlDB_update(void *VOLCTRLPtr, u8 rot_AB);
 //void semCutCtrl_update(void *SEMCTRL1Ptr, void *SEMCTRL2Ptr, u8 rot_AB);
 //void semQCtrl_update(void *SEMCTRL1Ptr, void *SEMCTRL2Ptr, u8 rot_AB);
 
+
+/*------------------------------------------------------------------------------------------------*/
+
 // called inside ddl update functions
-void ddlxnLengthCtrl(const bool centerLock, const float delayBase,
-		             const float tilt, ddllengthctrl_t ddlLengthBus);
+void ddlxnLengthCtrl(const bool centerLock, const float freqBase,
+		            const float tilt, float ddlLengthArray[MAXCHANNELS]);
 
 // Rotary Encoder updates delay length base -> generates delay length values -> updates DDL AXI-bus
 // pass XodAXICtrl object ptr
@@ -574,10 +481,15 @@ void ddlxnLength_update(void *DDLAXICTRLPtr, const bool centerLock, float *delay
 void ddlxnTilt_update(void *DDLAXICTRLPtr, const bool centerLock, const float freqBase,
 		              float *tilt, u8 rot_AB);
 
+void ddlxnLengthPack(float ddlLengthArr[MAXCHANNELS], XXodefx_top_Ddllengthctrl ddlLenCtrlBus);
+void ddlxnLengthUnPack(XXodefx_top_Ddllengthctrl ddlLenCtrlBus, float ddlLengthArr[MAXCHANNELS]);
+
+/*------------------------------------------------------------------------------------------------*/
+
 
 // called inside ssb update functions
 void ssbModFreqCtrl(const bool centerLock, const float freqBase,
-		            const float tilt, u32 phaseStepArray[MAXCHANNELS]);
+		            const float tilt, float phaseStepArray[MAXCHANNELS]);
 
 // Rotary Encoder updates frequency base -> generates phaseStep values -> updates SSB AXI-bus
 // pass XodAXICtrl object ptr
@@ -588,6 +500,10 @@ void ssbModFreq_update(void *SSBAXICTRLPtr, const bool centerLock, float *freqBa
 // pass XodAXICtrl object ptr
 void ssbModTilt_update(void *SSBAXICTRLPtr, const bool centerLock, const float freqBase,
 		               float *tilt, u8 rot_AB);
+
+void ssbModFreqPack(float ddlLengthArr[MAXCHANNELS], XXodefx_top_Ssbmodfreqctrl ssbModPhaseBus);
+void ssbModFreqUnPack(XXodefx_top_Ssbmodfreqctrl ssbModPhaseBus, float ddlLengthArr[MAXCHANNELS]);
+
 
 
 /*------------------------------------------------------------------------------------------------*/
@@ -603,7 +519,7 @@ void ssbModTilt_update(void *SSBAXICTRLPtr, const bool centerLock, const float f
 //void ddlxnLengthCtrl(const bool centerLock, const float delayBase,
 //		             const float tilt, float ddlLengthArray[MAXCHANNELS])
 void ddlxnLengthCtrl(const bool centerLock, const float delayBase,
-		             const float tilt, ddllengthctrl_t ddlLengthBus)
+		             const float tilt, float ddlLengthArray[MAXCHANNELS])
 {
 	int channels = (int)MAXCHANNELS;
 	// centerLock: locks two center step values to base frequency (else both sides shift from base freq!)
@@ -611,7 +527,6 @@ void ddlxnLengthCtrl(const bool centerLock, const float delayBase,
 	assert(channels <= 8);
 
 	//float ddlLengthArray[MAXCHANNELS] { 0 };
-
 
 	if (centerLock) {
 		for (int c = 0; c < channels; c++) {
@@ -635,11 +550,6 @@ void ddlxnLengthCtrl(const bool centerLock, const float delayBase,
 
 	}
 
-	for (int c = 0; c < channels; c++) {
-
-		ddlLenCtrlUnion
-
-	}
 }
 
 
@@ -648,7 +558,12 @@ void ddlxnLengthCtrl(const bool centerLock, const float delayBase,
 void ddlxnLength_update(void *DDLAXICTRLPtr, const bool centerLock, float *delayBase,
 					    const float tilt, u8 rot_AB)
 {
+
+	float ddlLenBase = 0;
+
 	float ddlLenArray[MAXCHANNELS];
+	XXodefx_top_Ddllengthctrl ddlLenPacked;
+
 
 	if(rot_AB == 0) {
 		//printf("Rotary Enc -Left- rotary1_AB = %d\n\r",rotary1_AB);ssbFreqScale
@@ -664,9 +579,11 @@ void ddlxnLength_update(void *DDLAXICTRLPtr, const bool centerLock, float *delay
 
 	}
 
-	ddlxnLengthCtrl(centerLock, *delayBase, tilt, ddlLenArray);
+	ddlLenBase = *delayBase;
 
-	XXodefx_top_Set_ddlLengthCtrl(DDLAXICTRLPtr, ddlLenArray);
+	ddlxnLengthCtrl(centerLock, ddlLenBase, tilt, ddlLenArray);
+	ddlxnLengthPack(ddlLenArray, ddlLenPacked);
+	XXodefx_top_Set_ddlLengthCtrl(DDLAXICTRLPtr, ddlLenPacked);
 
 }
 
@@ -675,7 +592,10 @@ void ddlxnLength_update(void *DDLAXICTRLPtr, const bool centerLock, float *delay
 void ddlxnTilt_update(void *DDLAXICTRLPtr, const bool centerLock, const float delayBase,
 		              float *tilt, u8 rot_AB)
 {
+	float ddlLenTilt = 0;
+
 	float ddlLenArray[MAXCHANNELS];
+	XXodefx_top_Ddllengthctrl ddlLenPacked;
 
 	if(rot_AB == 0) {
 		//printf("Rotary Enc -Left- rotary1_AB = %d\n\r",rotary1_AB);ssbFreqScale
@@ -690,11 +610,36 @@ void ddlxnTilt_update(void *DDLAXICTRLPtr, const bool centerLock, const float de
 	else {
 
 	}
-
-	ddlxnLengthCtrl(centerLock, delayBase, *tilt, ddlLenArray);
-
-	XXodefx_top_Set_ddlLengthCtrl(DDLAXICTRLPtr, ddlLenArray);
+	ddlLenTilt = *tilt;
+	ddlxnLengthCtrl(centerLock, delayBase, ddlLenTilt, ddlLenArray);
+	ddlxnLengthPack(ddlLenArray, ddlLenPacked);
+	XXodefx_top_Set_ddlLengthCtrl(DDLAXICTRLPtr, ddlLenPacked);
 }
+
+
+void ddlxnLengthPack(float ddlLengthArr[MAXCHANNELS], XXodefx_top_Ddllengthctrl ddlLenCtrlBus)
+{
+//	for (int c = 0; c < (int)MAXCHANNELS; c++) {
+//		ddlLengthCtrlData->ddlLenArr[c] = ddlLengthArr[c];
+//	}
+
+
+
+	ddlLengthCtrlData->ddlLen4CHAXI.word_0 = ddlLenArr[0];
+	ddlLengthCtrlData->ddlLen4CHAXI.word_1 = ddlLenArr[1];
+	ddlLengthCtrlData->ddlLen4CHAXI.word_2 = ddlLenArr[2];
+}
+
+void ddlxnLengthUnPack(XXodefx_top_Ddllengthctrl ddlLenCtrlBus, float ddlLengthArr[MAXCHANNELS])
+{
+	for (int c = 0; c < (int)MAXCHANNELS; c++) {
+		ddlLengthCtrl_u.ddlLen4CHAXI[c] = ddlLengthArray[c];
+	}
+}
+
+
+//unPackDDLlengthBus(ddlLengthAXIB, ddlLengthArray);
+
 
 
 
@@ -709,13 +654,13 @@ void ddlxnTilt_update(void *DDLAXICTRLPtr, const bool centerLock, const float de
 // (-1499 * (2**36 / 48000) = -2146051992  =>  2**31 - 1 = 2147483647 (1500 overflows 32 bits)
 
 void ssbModFreqCtrl(const bool centerLock, const float freqBase,
-		            const float tilt, u32 phaseStepArray[MAXCHANNELS])
+		            const float tilt, float phaseStepArray[MAXCHANNELS])
 {
 	int channels = (int)MAXCHANNELS;
 	// centerLock: locks two center step values to base frequency (else both sides shift from base freq!)
 	assert(channels % 2 == 0);
 	assert(channels <= 8);
-	u32 ddsOutFreqInit[MAXCHANNELS];
+	float ddsOutFreqInit[MAXCHANNELS];
 
 	if (centerLock) {
 		for (int c = 0; c < channels; c++) {
@@ -741,81 +686,89 @@ void ssbModFreqCtrl(const bool centerLock, const float freqBase,
 
 	for (int c = 0; c < channels; c++) {
 		// phaseStepArray[c] = static_cast<T>(ddsOutFreqInit[c] * pow(2, phaseWidth) / Fclk);
-		phaseStepArray[c] = (u32)(ddsOutFreqInit[c] * pow(2, ddsPhaseWidth) / Fs);
+		phaseStepArray[c] = (float)(ddsOutFreqInit[c] * pow(2, ddsPhaseWidth) / Fs);
 	}
 }
 
 
 // Rotary Encoder updates frequency base -> generates phaseStep values -> updates SSB AXI-bus
 // pass XodAXICtrl object ptr
-//void ssbModFreq_update(void *SSBAXICTRLPtr, const bool centerLock, double *freqBase,
-//					   const double tilt, u8 rot_AB, XXodefx_top_Ssbmodfreqctrl *ssbModPhaseSteps)
-//{
-//
-////	//		typedef struct {
-////	//		    u32 word_0;
-////	//		    u32 word_1;
-////	//		    u32 word_2;
-////	//		    u32 word_3;
-////	//		} XXodefx_top_Ssbmodfreqctrl;
-////	XXodefx_top_Ssbmodfreqctrl ssbModPhaseStep;
-//
-//	// Update SSB Modulator phase accumulator value (SSB modulation Frequency)
-//	if(rot_AB == 0) {
-//		//printf("Rotary Enc -Left- rotary1_AB = %d\n\r",rotary1_AB);ssbFreqScale
-//		ssbSetStepVal -= ssbFreqScale;
-//
-//		//if (ssbSetStepVal < 0) ssbSetStepVal = 0;
-//		//XGpio_DiscreteWrite(SSBCTRLPtr, 1, ssbSetStepVal);
-//
-//
-//		XXodefx_top_Set_ssbModFreqCtrl(SSBAXICTRLPtr, *ssbModPhaseSteps);
-//	}
-//	else if(rot_AB == 2) {
-//		//printf("Rotary Enc -Right- rotary1_AB = %d\n\r",rotary1_AB);
-//		ssbSetStepVal += ssbFreqScale;
-//
-//		//XGpio_DiscreteWrite(SSBCTRLPtr, 1, ssbSetStepVal);
-//	}
-//	else {
-//
-//	}
-//}
+void ssbModFreq_update(void *SSBAXICTRLPtr, const bool centerLock, double *freqBase,
+					   const double tilt, u8 rot_AB)
+{
+
+	float ssbModFreqBase = 0;
+
+	float phaseStepArray[MAXCHANNELS];
+	XXodefx_top_Ssbmodfreqctrl ssbModDataPacked;
+
+	// Update SSB Modulator phase accumulator value (SSB modulation Frequency)
+	if(rot_AB == 0) {
+		//printf("Rotary Enc -Left- rotary1_AB = %d\n\r",rotary1_AB);ssbFreqScale
+		*freqBase -= ssbFreqScale;
+	}
+	else if(rot_AB == 2) {
+		//printf("Rotary Enc -Right- rotary1_AB = %d\n\r",rotary1_AB);
+		*freqBase += ssbFreqScale;
+	}
+	else {
+
+	}
+	ssbModFreqBase = *freqBase;
+
+	ssbModFreqCtrl(centerLock, ssbModFreqBase, tilt, phaseStepArray);
+	ssbModFreqPack(phaseStepArray, ssbModDataPacked);
+	XXodefx_top_Set_ssbModFreqCtrl(SSBAXICTRLPtr, ssbModDataPacked);
+}
 
 // Rotary Encoder updates frequency tilt -> generates phaseStep values -> updates SSB AXI-bus
 // pass XodAXICtrl object ptr
 void ssbModTilt_update(void *SSBAXICTRLPtr, const bool centerLock, const float freqBase,
 					   float *tilt, u8 rot_AB)
 {
-	XXodefx_top_Ssbmodfreqctrl ssbModDataPacked { 0 };
+
+	float ssbModTilt = 0;
+
+	float phaseStepArray[MAXCHANNELS];
+	XXodefx_top_Ssbmodfreqctrl ssbModDataPacked;
 
 	if(rot_AB == 0) {
 		//printf("Rotary Enc -Left- rotary1_AB = %d\n\r",rotary1_AB);ssbFreqScale
-		tilt -= ssbFreqScale;
+		*tilt -= ssbFreqScale;
 
 	}
 	else if(rot_AB == 2) {
 		//printf("Rotary Enc -Right- rotary1_AB = %d\n\r",rotary1_AB);
-		tilt += ssbFreqScale;
+		*tilt += ssbFreqScale;
 
 	}
 	else {
 
 	}
-	//void ssbModFreqCtrl(const bool centerLock, const double freqBase,
-	//		            const double tilt, ddsCtrl_t phaseStepArray[MAXCHANNELS])
-	ssbModFreqCtrl(centerLock, freqBase, tilt, phaseStepArray);
+	ssbModTilt = *tilt;
 
-//	typedef struct {
-//	    u32 word_0;
-//	    u32 word_1;
-//	    u32 word_2;
-//	    u32 word_3;
-//	} XXodefx_top_Ssbmodfreqctrl;
-
-	XXodefx_top_Set_ssbModFreqCtrl(SSBAXICTRLPtr, XXodefx_top_Ssbmodfreqctrl Data);
+	ssbModFreqCtrl(centerLock, freqBase, ssbModTilt, phaseStepArray);
+	ssbModFreqPack(phaseStepArray, ssbModDataPacked);
+	XXodefx_top_Set_ssbModFreqCtrl(SSBAXICTRLPtr, ssbModDataPacked);
 
 }
+
+
+void ssbModFreqPack(float ddlLengthArr[MAXCHANNELS], XXodefx_top_Ssbmodfreqctrl ssbModPhaseBus)
+{
+	for (int c = 0; c < (int)MAXCHANNELS; c++) {
+		ddlLengthCtrl_u.ddlLen4CHAXI[c] = ddlLengthArray[c];
+	}
+}
+
+void ssbModFreqUnPack(XXodefx_top_Ssbmodfreqctrl ssbModPhaseBus, float ddlLengthArr[MAXCHANNELS])
+{
+	for (int c = 0; c < (int)MAXCHANNELS; c++) {
+		ddlLengthCtrl_u.ddlLen4CHAXI[c] = ddlLengthArray[c];
+	}
+}
+
+
 
 // ** FIXIT **
 //----------------------------------------------------
@@ -1412,15 +1365,12 @@ void BTN_Intr_Handler(void *InstancePtr)
 		//printf("audioSrcMux: %d\n", auMuxUnion.audioSelect.audioSrcMux);
 		sysmode = 1;
 		trigOnce = 1;
-
 //		if (auMuxUnion.audioSelect.audioSrcMux == 4) {
 //			auMuxUnion.audioSelect.audioSrcMux = 0;
 //		} else {
 //			auMuxUnion.audioSelect.audioSrcMux++;
 //		}
-//
 //		printf("audioMuxSelect = %d\n", (int)auMuxUnion.audioMuxSel);
-//
 //		XGpio_DiscreteWrite( &AUDIOMUXInst, 1, auMuxUnion.audioMuxSel);
 
 	}
@@ -1439,95 +1389,6 @@ void BTN_Intr_Handler(void *InstancePtr)
     XGpio_InterruptEnable(&BTNInst, BTN_CH_MASK);
 
 }
-
-
-//----------------------------------------------------
-// Pmod BTN INTERRUPT HANDLER
-// - button interrupt, performs
-// -
-// - Button Values returned when pressed:
-// - pBTN1, pBTN2, pBTN3, pBTN4
-//----------------------------------------------------
-//void BTN0x1_Intr_Handler(void *InstancePtr)
-//{
-//
-//	// Disable GPIO interrupts
-//	XGpio_InterruptDisable(InstancePtr, BTN0_CH_MASK);
-//
-//	// Ignore additional button presses
-//	if ((XGpio_InterruptGetStatus(InstancePtr) & BTN0_CH_MASK) != BTN0_CH_MASK) {
-//		return;
-//	}
-//
-//	btn0x1_value = XGpio_DiscreteRead(InstancePtr, 1);
-//
-//	//printf("Pmod BTN0 - btn0x1_value = %d\n", btn0x1_value);
-//
-//	if(btn0x1_value == 1) {
-//		// Fader1 Mux Sel - selects the target for fader1 control
-//		printf("btn0x1[%d] - Fader1 Target Select\n", btn0x1_value);
-//		sysmode = 2;
-//		trigOnce = 1;
-//
-//		if (fader1MuxSel == 12) {
-//			fader1MuxSel = 0;
-//		} else {
-//			fader1MuxSel++;
-//		}
-//	}
-//	else if(btn0x1_value == 2) {
-//		// Fader2 Mux Sel - selects the target for fader2 control
-//		printf("btn0x1[%d] - Fader 2 Target Select\n", btn0x1_value);
-//
-//		sysmode = 3;
-//		trigOnce = 1;
-//
-//		if (fader2MuxSel == 12) {
-//			fader2MuxSel = 0;
-//		} else {
-//			fader2MuxSel++;
-//		}
-//
-//	}
-//	else if(btn0x1_value == 4) {
-//		// Fader2 Mux Sel - selects the target for fader2 control
-//		printf("btn0x1[%d] - Fader3 Target Select\n", btn0x1_value);
-//		sysmode = 4;
-//		trigOnce = 1;
-//		if (fader3MuxSel == 12) {
-//			fader3MuxSel = 0;
-//		} else {
-//			fader3MuxSel++;
-//		}
-//
-//	}
-//	else if(btn0x1_value == 8) {
-//		// Audio Mux Select - btn increments mux sel
-//		printf("BTN0x1[%d] - Fader4 Target Select\n", btn0x1_value);
-//		sysmode = 5;
-//		trigOnce = 1;
-//		if (fader4MuxSel == 12) {
-//			fader4MuxSel = 0;
-//		} else {
-//			fader4MuxSel++;
-//		}
-//
-//	}
-//	// null case
-//	else {
-//		// - null -
-//		printf("btn0x1[%d] - null - \n", btn0x1_value);
-//	}
-//
-//	usleep(300000);		// Wait 1/? seconds - button debounce
-//						// prevents release-triggered interrupt
-//
-//    (void)XGpio_InterruptClear(InstancePtr, BTN0_CH_MASK);
-//
-//    // Enable GPIO interrupts
-//    XGpio_InterruptEnable(InstancePtr, BTN0_CH_MASK);
-//
-//}
 
 
 //----------------------------------------------------
@@ -1561,13 +1422,13 @@ void rotary_select(u8 *rotary_AB, u8 *faderMuxSel, float *faderLvl)
 
 			delayBase -= ddlLengthScale;
 			if (delayBase < 0) delayBase = 0;
-			if (delayBase > maxDlyLength) delayBase = maxDlyLength;
+			if (delayBase > MAXDELAY) delayBase = MAXDELAY;
 
 //			float delayLengthTmp = delayBase;
 //			delayLengthTmp -= ddlLengthScale;
 //			if (delayLengthTmp < 0 || delayLengthTmp > maxDlyLength) delayLengthTmp = 0;
 //			delayBase = delayLengthTmp;
-			ddlxnLength_update(&XodAXICtrl, centerLock, &delayBase, cv   tilt, 0);
+			ddlxnLength_update(&XodAXICtrl, ddlCenterLock, &delayBase, tilt, 0);
 
 
 		} else if(*rotary_AB == 2) {
@@ -1575,28 +1436,36 @@ void rotary_select(u8 *rotary_AB, u8 *faderMuxSel, float *faderLvl)
 
 			delayBase += ddlLengthScale;
 			if (delayBase < 0) delayBase = 0;
-			if (delayBase > maxDlyLength) delayBase = maxDlyLength;
+			if (delayBase > MAXDELAY) delayBase = MAXDELAY;
 
 //			DDLCTRL2Union.DDLCTRL2.delayLength = delayLengthTmp;
 //			printf("delayLength = %d\n", (int)DDLCTRL2Union.DDLCTRL2.delayLength);
 //			XGpio_DiscreteWrite(&DDLCTRLInst, 2, DDLCTRL2Union.DDLCTRL_CH2Val);
-			ddlxnLength_update(&XodAXICtrl, centerLock, &delayBase, cv   tilt, 2);
+			ddlxnLength_update(&XodAXICtrl, ddlCenterLock, &delayBase, tilt, 2);
 
 		}
 		else {
 		}
-		*faderLvl = (float)(delayLengthTmp>>16);		// shift 8 MSB, 8 frac
+		*faderLvl = (float)(delayBase);		// Fix scaling for display
 
 	} else if (*faderMuxSel == 2) {
 		//printf("DDL Wet/Dry Ctrl: Fader2 MuxSel = %d\n\r",fader2MuxSel);
 		// DDL Wet/Dry 15bit {0 = 100% Dry : 32767 100% Wet}
 		if(*rotary_AB == 0) {
 			//printf("Rotary Enc -Left- rotary2_AB = %d\n", rotary2_AB);
-			ddlWetMixFloat -= ddlWetDryScale;
-			if (ddlWetMixFloat <= 0.0) ddlWetMixFloat = 0.0;		// -140 DB, Min Volume
-			DDLCTRL1Union.DDLCTRL1.wetMix = (u16)(ddlWetMixFloat * (1 << (ddlCtrlBwidth-1)));
+
+			freqBase -= ddlWetDryScale;
+			??if (delayBase < 0) delayBase = 0;
+			??if (delayBase > ??h) delayBase = ??;
+
+			//ddlWetMixFloat -= ddlWetDryScale;
+			//if (ddlWetMixFloat <= 0.0) ddlWetMixFloat = 0.0;		// -140 DB, Min Volume
+			//DDLCTRL1Union.DDLCTRL1.wetMix = (u16)(ddlWetMixFloat * (1 << (ddlCtrlBwidth-1)));
 			//printf("ddlWetMixFloat = %f,  wetMix = %d\n", ddlWetMixFloat, (int)DDLCTRL1Union.DDLCTRL1.wetMix);
-			XGpio_DiscreteWrite(&DDLCTRLInst, 1, DDLCTRL1Union.DDLCTRL_CH1Val);
+			//XGpio_DiscreteWrite(&DDLCTRLInst, 1, DDLCTRL1Union.DDLCTRL_CH1Val);
+
+			ssbModTilt_update(&XodAXICtrl, centerLock, &freqBase, tilt, 0);
+
 		}
 		else if(*rotary_AB == 2) {
 			//printf("Rotary Enc -Right- rotary2_AB = %d\n", rotary2_AB);
@@ -1636,16 +1505,16 @@ void rotary_select(u8 *rotary_AB, u8 *faderMuxSel, float *faderLvl)
 		}
 		*faderLvl = ddlFBGainFloat * 100;    // (???)
 
-	} else if (*faderMuxSel == 4) {
-		//printf("SSB Freq Ctrl: Fader MuxSel = %d\n\r",);
-		ssbStepCtrl_update(&SSBMODFreq1Inst, *rotary_AB);
-		*faderLvl = (float)ssbSetStepVal;
-
-
-	} else if (*faderMuxSel == 6) {
-		//printf("Waveshaper1 Gain Ctrl: Fader MuxSel = %d\n\r", fader1MuxSel);
-		wsGainCtrl_update(&VOLWSGAINInst, *rotary_AB);
-		*faderLvl = wsGainFloat;
+//	} else if (*faderMuxSel == 4) {
+//		//printf("SSB Freq Ctrl: Fader MuxSel = %d\n\r",);
+//		ssbStepCtrl_update(&SSBMODFreq1Inst, *rotary_AB);
+//		*faderLvl = (float)ssbSetStepVal;
+//
+//
+//	} else if (*faderMuxSel == 6) {
+//		//printf("Waveshaper1 Gain Ctrl: Fader MuxSel = %d\n\r", fader1MuxSel);
+//		wsGainCtrl_update(&VOLWSGAINInst, *rotary_AB);
+//		*faderLvl = wsGainFloat;
 
 
 //	} else if (*faderMuxSel == 2) {
@@ -1826,6 +1695,96 @@ void ROTARY4_Intr_Handler(void *InstancePtr)
     XGpio_InterruptEnable(InstancePtr, ROTARY_INT);
 
 }
+
+
+
+//----------------------------------------------------
+// Pmod BTN INTERRUPT HANDLER
+// - button interrupt, performs
+// -
+// - Button Values returned when pressed:
+// - pBTN1, pBTN2, pBTN3, pBTN4
+//----------------------------------------------------
+//void BTN0x1_Intr_Handler(void *InstancePtr)
+//{
+//
+//	// Disable GPIO interrupts
+//	XGpio_InterruptDisable(InstancePtr, BTN0_CH_MASK);
+//
+//	// Ignore additional button presses
+//	if ((XGpio_InterruptGetStatus(InstancePtr) & BTN0_CH_MASK) != BTN0_CH_MASK) {
+//		return;
+//	}
+//
+//	btn0x1_value = XGpio_DiscreteRead(InstancePtr, 1);
+//
+//	//printf("Pmod BTN0 - btn0x1_value = %d\n", btn0x1_value);
+//
+//	if(btn0x1_value == 1) {
+//		// Fader1 Mux Sel - selects the target for fader1 control
+//		printf("btn0x1[%d] - Fader1 Target Select\n", btn0x1_value);
+//		sysmode = 2;
+//		trigOnce = 1;
+//
+//		if (fader1MuxSel == 12) {
+//			fader1MuxSel = 0;
+//		} else {
+//			fader1MuxSel++;
+//		}
+//	}
+//	else if(btn0x1_value == 2) {
+//		// Fader2 Mux Sel - selects the target for fader2 control
+//		printf("btn0x1[%d] - Fader 2 Target Select\n", btn0x1_value);
+//
+//		sysmode = 3;
+//		trigOnce = 1;
+//
+//		if (fader2MuxSel == 12) {
+//			fader2MuxSel = 0;
+//		} else {
+//			fader2MuxSel++;
+//		}
+//
+//	}
+//	else if(btn0x1_value == 4) {
+//		// Fader2 Mux Sel - selects the target for fader2 control
+//		printf("btn0x1[%d] - Fader3 Target Select\n", btn0x1_value);
+//		sysmode = 4;
+//		trigOnce = 1;
+//		if (fader3MuxSel == 12) {
+//			fader3MuxSel = 0;
+//		} else {
+//			fader3MuxSel++;
+//		}
+//
+//	}
+//	else if(btn0x1_value == 8) {
+//		// Audio Mux Select - btn increments mux sel
+//		printf("BTN0x1[%d] - Fader4 Target Select\n", btn0x1_value);
+//		sysmode = 5;
+//		trigOnce = 1;
+//		if (fader4MuxSel == 12) {
+//			fader4MuxSel = 0;
+//		} else {
+//			fader4MuxSel++;
+//		}
+//
+//	}
+//	// null case
+//	else {
+//		// - null -
+//		printf("btn0x1[%d] - null - \n", btn0x1_value);
+//	}
+//
+//	usleep(300000);		// Wait 1/? seconds - button debounce
+//						// prevents release-triggered interrupt
+//
+//    (void)XGpio_InterruptClear(InstancePtr, BTN0_CH_MASK);
+//
+//    // Enable GPIO interrupts
+//    XGpio_InterruptEnable(InstancePtr, BTN0_CH_MASK);
+//
+//}
 
 
 /*------------------------------------------------------------------------------------------------*/
@@ -2526,16 +2485,15 @@ int main(void)
 	}
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Initialize Oscillators
+    // SSB Modulator Initialization
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//    // Initialize DDS Freq1 & SSB setStep Gpio
-    status = XGpio_Initialize(&SSBMODFreq1Inst, GPIO_SSBMODFreq1_ID);
-    if(status != XST_SUCCESS) return XST_FAILURE;
 
-//    // Initialize DDS Freq2 & PWM setStep Gpio
-//    status = XGpio_Initialize(&OSCF2PWMStepInst, GPIO_OSCF2_PWM_ID);
-//    if(status != XST_SUCCESS) return XST_FAILURE;
+    // Initialize DDS Freq1 & SSB setStep Gpio
+    // status = XGpio_Initialize(&SSBMODFreq1Inst, GPIO_SSBMODFreq1_ID);
+    // if(status != XST_SUCCESS) return XST_FAILURE;
+
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Initialize Filters
@@ -2655,6 +2613,9 @@ int main(void)
 
 	odmkInfoScreen(&oledrgb, BPM);
 
+	// instance union
+	//ddlLengthCtrl_u ddlLengthCtrlData;
+	//ssbModFreqCtrl_u ssbModFreqCtrlData;
 
 	// Default Fader Target settings
 	// 0: MSTRVOL, 1: DDLLENGTH, 2: DDLMIX, 3: DDLFBGAIN, 4: SSBMODFreq1
@@ -2688,22 +2649,22 @@ int main(void)
 	//XGpio_DiscreteWrite(&AUDIOMUXInst, 1, auMuxUnion.audioMuxSel);
 
 	// OSC INIT
-	XGpio_DiscreteWrite(&SSBMODFreq1Inst, 1, ssbSetStepVal);
+	//XGpio_DiscreteWrite(&SSBMODFreq1Inst, 1, ssbSetStepVal);
 	//XGpio_DiscreteWrite(&OSCF1SSBStepInst, 2, ssbSetStepVal);
 
 	//XGpio_DiscreteWrite(&OSCF2PWMStepInst, 1, oscFreq2StepVal);
 	//XGpio_DiscreteWrite(&OSCF2PWMStepInst, 2, oscPWMStepVal);
 
 	// DDL INIT
-	DDLCTRL1Union.DDLCTRL1.wetMix = 29491;									// 0.9 << 15
-	DDLCTRL1Union.DDLCTRL1.feedbackGain = 31129;							// 0.95 << 15
-	XGpio_DiscreteWrite(&DDLCTRLInst, 1, DDLCTRL1Union.DDLCTRL_CH1Val);
+	//DDLCTRL1Union.DDLCTRL1.wetMix = 29491;									// 0.9 << 15
+	//DDLCTRL1Union.DDLCTRL1.feedbackGain = 31129;							// 0.95 << 15
+	//XGpio_DiscreteWrite(&DDLCTRLInst, 1, DDLCTRL1Union.DDLCTRL_CH1Val);
 
-	DDLCTRL2Union.DDLCTRL2.delayLength = 450688;
-	XGpio_DiscreteWrite(&DDLCTRLInst, 2, DDLCTRL2Union.DDLCTRL_CH2Val);
+	//DDLCTRL2Union.DDLCTRL2.delayLength = 450688;
+	//XGpio_DiscreteWrite(&DDLCTRLInst, 2, DDLCTRL2Union.DDLCTRL_CH2Val);
 
 	// TEMP DEBUG
-	printf("\n::((Update DDLCTRLInst wetMix, delayLength))::\n");
+	// printf("\n::((Update DDLCTRLInst wetMix, delayLength))::\n");
 
 	// MOOG Half Ladder Filter INIT
 	//setFcAndRes_ARM(fs, mooghlCutoff, 0.0, &mooghlParam);
@@ -2769,9 +2730,9 @@ int main(void)
 //				printf("moog-hl Cutoff = %6.2f,   moog-hl Resonance = %2.2f\n", mooghlCutoff, mooghlRes);
 //				printf("SEM State Variable Filter Parameters:\n");
 //				printf("sem-svf Cutoff = %6.2f,   sem-svf Q = %2.2f\n", semCutoff, semQ);
-				printf("ddlWetMixFloat = %2.2f,   wetMix = %d\n", ddlWetMixFloat, (int)DDLCTRL1Union.DDLCTRL1.wetMix);
-				printf("delayLength = %d\n", (int)DDLCTRL2Union.DDLCTRL2.delayLength);
-				printf("ddlFBGainFloat = %3.2f,   feedbackGain = %d\n", ddlFBGainFloat, (int)DDLCTRL1Union.DDLCTRL1.feedbackGain);
+//				printf("ddlWetMixFloat = %2.2f,   wetMix = %d\n", ddlWetMixFloat, (int)DDLCTRL1Union.DDLCTRL1.wetMix);
+//				printf("delayLength = %d\n", (int)DDLCTRL2Union.DDLCTRL2.delayLength);
+//				printf("ddlFBGainFloat = %3.2f,   feedbackGain = %d\n", ddlFBGainFloat, (int)DDLCTRL1Union.DDLCTRL1.feedbackGain);
 //				printf("waveshaperGainFloat= %4.2f,   waveshaperGain = %d\n", wsGainFloat, (int)wsGainVal);
 
 				printf("// *-------------------------------------------------* //\n");
