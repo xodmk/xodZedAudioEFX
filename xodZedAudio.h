@@ -223,10 +223,10 @@ struct ddlLength4CHAXI_t {
 	u32 ddlLengthCH3;
 };
 
-typedef union {
+union ddlLengthCtrl_u {
 	u32 ddlLenArr[3];		// 3 x 24bits for 4CH delay
 	XXodefx_top_Ddllengthctrl ddlLen4CHAXI;
-} ddlLengthCtrl_u;
+};
 
 
 
