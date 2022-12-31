@@ -117,10 +117,6 @@ XXodefx_top XodAXICtrl;
 
 char efxTestName[] = "Mumra_was_here";
 // const std::string efxTestName = "Mumra_was_here";
-// const std::string &outDir
-
-//const u32 			MAXDELAY = 16384; 					// ap_uint<16,8> delay_t;
-//const u32 maxDlyLength = 65535<<8; 			// ap_uint<16,8> delay_t;
 
 
 static float 		volCtrlDB = 25.2;		// Attenuation amount: 0 DB = full volume, -140 DB ~ -inf
@@ -137,7 +133,6 @@ static bool			ssbCenterLock = 1;
 
 ///// DDL controls /////
 static float 		ddlWetDryScale = 0.023;
-//static u32 			ddlLengthScaleBase = 128;				// default base scale (pre-scaled scaler)
 static float 		ddlFbGainScale = 0.023;
 
 // *--------------------------------------------------------------------------------* //
@@ -172,7 +167,6 @@ const float wsGainScale = 0.46;
 
 //const int semCutoffScale = 111;
 //const float semQScale = 0.007;
-
 
 const unsigned int  ddlCtrlBwidth = 16;			// ap_ufixed<16,8>
 
@@ -211,8 +205,8 @@ static u8 rotary4_AB = 0;
 
 
 
-static union ddlLengthCtrl_u *ddlLengthCtrlData;
-static union ssbModFreqCtrl_u *ssbModFreqCtrlData;
+static union ddlLengthCtrl_u ddlLengthCtrlData;
+static union ssbModFreqCtrl_u ssbModFreqCtrlData;
 
 /*------------------------------------------------------------------------------------------------*/
 // AXI Bus aggregates
@@ -278,6 +272,7 @@ static u32 ddlTiltScale = 0.1;
 
 //static int ssbSetStepVal = 11000093;	// SSM Modulation frequency
 static int ssbFreqScale = 0.01;
+static u32 ssbTiltScale = 0.1;
 
 /*------------------------------------------------------------------------------------------------*/
 
@@ -619,22 +614,22 @@ void ddlxnTilt_update(void *DDLAXICTRLPtr, const bool centerLock, const float de
 
 void ddlxnLengthPack(float ddlLengthArr[MAXCHANNELS], XXodefx_top_Ddllengthctrl ddlLenCtrlBus)
 {
-//	for (int c = 0; c < (int)MAXCHANNELS; c++) {
-//		ddlLengthCtrlData->ddlLenArr[c] = ddlLengthArr[c];
-//	}
-
-
-
-	ddlLengthCtrlData->ddlLen4CHAXI.word_0 = ddlLenArr[0];
-	ddlLengthCtrlData->ddlLen4CHAXI.word_1 = ddlLenArr[1];
-	ddlLengthCtrlData->ddlLen4CHAXI.word_2 = ddlLenArr[2];
+	// pack 4 x 24bit into 3 x 32bit
+	u32 ddlLengthRound[MAXCHANNELS];
+	for (int c = 0; c < (int)MAXCHANNELS; c++) {
+		ddlLengthRound[c] = (u32)round(ddlLengthArr[c]);
+	}
+	ddlLenCtrlBus.word_0 = (u32)( ((ddlLengthRound[1] << 24) & 0xff000000) | (ddlLengthRound[0] & 0x00ffffff) );
+	ddlLenCtrlBus.word_1 = (u32)( ((ddlLengthRound[2] << 16) & 0xffff0000) | ((ddlLengthRound[1] >> 8) & 0x0000ffff) );
+	ddlLenCtrlBus.word_2 = (u32)( ((ddlLengthRound[3] << 8) & 0xffffff00) | ((ddlLengthRound[2] >> 16) & 0x000000ff) );
 }
 
 void ddlxnLengthUnPack(XXodefx_top_Ddllengthctrl ddlLenCtrlBus, float ddlLengthArr[MAXCHANNELS])
 {
-	for (int c = 0; c < (int)MAXCHANNELS; c++) {
-		ddlLengthCtrl_u.ddlLen4CHAXI[c] = ddlLengthArray[c];
-	}
+	ddlLengthArr[0] = (float)( ddlLenCtrlBus.word_0 & 0x00ffffff );
+	ddlLengthArr[1] = (float)( ((ddlLenCtrlBus.word_1 << 8) & 0x00ffff00) | ((ddlLenCtrlBus.word_0 >> 24) & 0x000000ff) );
+	ddlLengthArr[2] = (float)( ((ddlLenCtrlBus.word_2 << 16) & 0x00ff0000) | ((ddlLenCtrlBus.word_1 >> 16) & 0x0000ffff) );
+	ddlLengthArr[3] = (float)( (ddlLenCtrlBus.word_2 >> 8) & 0x00ffffff );
 }
 
 
@@ -693,8 +688,8 @@ void ssbModFreqCtrl(const bool centerLock, const float freqBase,
 
 // Rotary Encoder updates frequency base -> generates phaseStep values -> updates SSB AXI-bus
 // pass XodAXICtrl object ptr
-void ssbModFreq_update(void *SSBAXICTRLPtr, const bool centerLock, double *freqBase,
-					   const double tilt, u8 rot_AB)
+void ssbModFreq_update(void *SSBAXICTRLPtr, const bool centerLock, float *freqBase,
+					   const float tilt, u8 rot_AB)
 {
 
 	float ssbModFreqBase = 0;
@@ -757,14 +752,14 @@ void ssbModTilt_update(void *SSBAXICTRLPtr, const bool centerLock, const float f
 void ssbModFreqPack(float ddlLengthArr[MAXCHANNELS], XXodefx_top_Ssbmodfreqctrl ssbModPhaseBus)
 {
 	for (int c = 0; c < (int)MAXCHANNELS; c++) {
-		ddlLengthCtrl_u.ddlLen4CHAXI[c] = ddlLengthArray[c];
+		ssbModFreqCtrlData.ssbFreqArr[c] = (u32)ddlLengthArr[c];
 	}
 }
 
 void ssbModFreqUnPack(XXodefx_top_Ssbmodfreqctrl ssbModPhaseBus, float ddlLengthArr[MAXCHANNELS])
 {
 	for (int c = 0; c < (int)MAXCHANNELS; c++) {
-		ddlLengthCtrl_u.ddlLen4CHAXI[c] = ddlLengthArray[c];
+		ddlLengthArr[c] = (float)ssbModFreqCtrlData.ssbFreqArr[c];
 	}
 }
 
@@ -1404,7 +1399,7 @@ void rotary_select(u8 *rotary_AB, u8 *faderMuxSel, float *faderLvl)
 {
 
 	if (*faderMuxSel == 0) {
-		printf("Master Vol Ctrl: Fader MuxSel = %d\n\r", faderMuxSel);
+		printf("Master Vol Ctrl: Fader MuxSel = %d\n\r", *faderMuxSel);
 		volCtrlDB_update(&VOLWSGAINInst, *rotary_AB);
 		*faderLvl = (float)volCtrlDB;
 
@@ -1428,7 +1423,7 @@ void rotary_select(u8 *rotary_AB, u8 *faderMuxSel, float *faderLvl)
 //			delayLengthTmp -= ddlLengthScale;
 //			if (delayLengthTmp < 0 || delayLengthTmp > maxDlyLength) delayLengthTmp = 0;
 //			delayBase = delayLengthTmp;
-			ddlxnLength_update(&XodAXICtrl, ddlCenterLock, &delayBase, tilt, 0);
+			ddlxnLength_update(&XodAXICtrl, ddlCenterLock, &delayBase, ddlTilt, 0);
 
 
 		} else if(*rotary_AB == 2) {
@@ -1441,7 +1436,7 @@ void rotary_select(u8 *rotary_AB, u8 *faderMuxSel, float *faderLvl)
 //			DDLCTRL2Union.DDLCTRL2.delayLength = delayLengthTmp;
 //			printf("delayLength = %d\n", (int)DDLCTRL2Union.DDLCTRL2.delayLength);
 //			XGpio_DiscreteWrite(&DDLCTRLInst, 2, DDLCTRL2Union.DDLCTRL_CH2Val);
-			ddlxnLength_update(&XodAXICtrl, ddlCenterLock, &delayBase, tilt, 2);
+			ddlxnLength_update(&XodAXICtrl, ddlCenterLock, &delayBase, ddlTilt, 2);
 
 		}
 		else {
@@ -1454,9 +1449,9 @@ void rotary_select(u8 *rotary_AB, u8 *faderMuxSel, float *faderLvl)
 		if(*rotary_AB == 0) {
 			//printf("Rotary Enc -Left- rotary2_AB = %d\n", rotary2_AB);
 
-			freqBase -= ddlWetDryScale;
-			??if (delayBase < 0) delayBase = 0;
-			??if (delayBase > ??h) delayBase = ??;
+			freqBase -= ssbFreqScale;
+			if (delayBase < 0) delayBase = 0;
+			if (delayBase > MAXDELAY) delayBase = MAXDELAY;
 
 			//ddlWetMixFloat -= ddlWetDryScale;
 			//if (ddlWetMixFloat <= 0.0) ddlWetMixFloat = 0.0;		// -140 DB, Min Volume
@@ -1464,46 +1459,109 @@ void rotary_select(u8 *rotary_AB, u8 *faderMuxSel, float *faderLvl)
 			//printf("ddlWetMixFloat = %f,  wetMix = %d\n", ddlWetMixFloat, (int)DDLCTRL1Union.DDLCTRL1.wetMix);
 			//XGpio_DiscreteWrite(&DDLCTRLInst, 1, DDLCTRL1Union.DDLCTRL_CH1Val);
 
-			ssbModTilt_update(&XodAXICtrl, centerLock, &freqBase, tilt, 0);
+			ssbModFreq_update(&XodAXICtrl, ssbCenterLock, &freqBase, ssbTilt, 0);
 
 		}
 		else if(*rotary_AB == 2) {
-			//printf("Rotary Enc -Right- rotary2_AB = %d\n", rotary2_AB);
-			ddlWetMixFloat += ddlWetDryScale;
-			if (ddlWetMixFloat >= 1.0) ddlWetMixFloat = 1.0;
-			DDLCTRL1Union.DDLCTRL1.wetMix = (u16)(ddlWetMixFloat * (1 << (ddlCtrlBwidth-1)));
+			//printf("Rotary Enc -Left- rotary2_AB = %d\n", rotary2_AB);
+
+			freqBase += ssbFreqScale;
+			if (delayBase < 0) delayBase = 0;
+			if (delayBase > MAXDELAY) delayBase = MAXDELAY;
+
+			//ddlWetMixFloat -= ddlWetDryScale;
+			//if (ddlWetMixFloat <= 0.0) ddlWetMixFloat = 0.0;		// -140 DB, Min Volume
+			//DDLCTRL1Union.DDLCTRL1.wetMix = (u16)(ddlWetMixFloat * (1 << (ddlCtrlBwidth-1)));
 			//printf("ddlWetMixFloat = %f,  wetMix = %d\n", ddlWetMixFloat, (int)DDLCTRL1Union.DDLCTRL1.wetMix);
-			XGpio_DiscreteWrite(&DDLCTRLInst, 1, DDLCTRL1Union.DDLCTRL_CH1Val);
+			//XGpio_DiscreteWrite(&DDLCTRLInst, 1, DDLCTRL1Union.DDLCTRL_CH1Val);
+
+			ssbModFreq_update(&XodAXICtrl, ssbCenterLock, &freqBase, ssbTilt, 0);
 		}
 		else {
 		}
-		*faderLvl = ddlWetMixFloat*100;
+		*faderLvl = freqBase * 100;
 
 	} else if (*faderMuxSel == 3) {
 
 		//printf("DDL feedback Gain Ctrl: Fader2 MuxSel = %d\n\r",fader2MuxSel);
 		// DDL feedback Gain control {0 samples MIN : ? samples MAX}
 		if(*rotary_AB == 0) {
-			//printf("Rotary Enc -Left- rotary1_AB = %d\n\r", rotary2_AB);
-			ddlFBGainFloat -= ddlFbGainScale;
-			if (ddlFBGainFloat < 0) ddlFBGainFloat = 0;
-			DDLCTRL1Union.DDLCTRL1.feedbackGain = (u16)(ddlFBGainFloat * (1 << (ddlCtrlBwidth-1)));
-			printf("ddlFBGainFloat = %f,   feedbackGain = %d\n", ddlFBGainFloat, (int)DDLCTRL1Union.DDLCTRL1.feedbackGain);
-			XGpio_DiscreteWrite(&DDLCTRLInst, 1, DDLCTRL1Union.DDLCTRL_CH1Val);
+			//printf("Rotary Enc -Left- rotary2_AB = %d\n", rotary2_AB);
+
+			ddlTilt -= ssbTiltScale;
+			if (delayBase < 0) delayBase = 0;
+			if (delayBase > MAXDELAY) delayBase = MAXDELAY;
+
+			ddlxnTilt_update(&XodAXICtrl, ddlCenterLock, freqBase, &ssbTilt, 0);
+
 		}
 		else if(*rotary_AB == 2) {
-			//printf("Rotary Enc -Right- rotary1_AB = %d\n\r", rotary2_AB);
-			ddlFBGainFloat += ddlFbGainScale;
-			if (ddlFBGainFloat >= 1.0) {
-				ddlFBGainFloat = 1.0;
-			}
-			DDLCTRL1Union.DDLCTRL1.feedbackGain = (u16)(ddlFBGainFloat * (1 << (ddlCtrlBwidth-1)));
-			printf("ddlFBGainFloat = %f,   feedbackGain = %d\n", ddlFBGainFloat, (int)DDLCTRL1Union.DDLCTRL1.feedbackGain);
-			XGpio_DiscreteWrite(&DDLCTRLInst, 1, DDLCTRL1Union.DDLCTRL_CH1Val);
+			//printf("Rotary Enc -Left- rotary2_AB = %d\n", rotary2_AB);
+
+			freqBase += ssbTiltScale;
+			if (delayBase < 0) delayBase = 0;
+			if (delayBase > MAXDELAY) delayBase = MAXDELAY;
+
+			ddlxnTilt_update(&XodAXICtrl, ddlCenterLock, freqBase, &ssbTilt, 0);
 		}
 		else {
 		}
-		*faderLvl = ddlFBGainFloat * 100;    // (???)
+		*faderLvl = ddlTilt * 100;
+
+
+	} else if (*faderMuxSel == 4) {
+
+		//printf("DDL feedback Gain Ctrl: Fader2 MuxSel = %d\n\r",fader2MuxSel);
+		// DDL feedback Gain control {0 samples MIN : ? samples MAX}
+		if(*rotary_AB == 0) {
+			//printf("Rotary Enc -Left- rotary2_AB = %d\n", rotary2_AB);
+
+			ssbTilt -= ssbTiltScale;
+			if (delayBase < 0) delayBase = 0;
+			if (delayBase > MAXDELAY) delayBase = MAXDELAY;
+
+			ssbModTilt_update(&XodAXICtrl, ssbCenterLock, freqBase, &ssbTilt, 0);
+
+		}
+		else if(*rotary_AB == 2) {
+			//printf("Rotary Enc -Left- rotary2_AB = %d\n", rotary2_AB);
+
+			ssbTilt += ssbTiltScale;
+			if (delayBase < 0) delayBase = 0;
+			if (delayBase > MAXDELAY) delayBase = MAXDELAY;
+
+			ssbModTilt_update(&XodAXICtrl, ssbCenterLock, freqBase, &ssbTilt, 0);
+		}
+		else {
+		}
+		*faderLvl = ssbTilt * 100;
+
+
+//	} else if (*faderMuxSel == ddlFeedback ctrl) {
+//
+//		//printf("DDL feedback Gain Ctrl: Fader2 MuxSel = %d\n\r",fader2MuxSel);
+//		// DDL feedback Gain control {0 samples MIN : ? samples MAX}
+//		if(*rotary_AB == 0) {
+//			//printf("Rotary Enc -Left- rotary1_AB = %d\n\r", rotary2_AB);
+//			ddlFBGainFloat -= ddlFbGainScale;
+//			if (ddlFBGainFloat < 0) ddlFBGainFloat = 0;
+//			DDLCTRL1Union.DDLCTRL1.feedbackGain = (u16)(ddlFBGainFloat * (1 << (ddlCtrlBwidth-1)));
+//			printf("ddlFBGainFloat = %f,   feedbackGain = %d\n", ddlFBGainFloat, (int)DDLCTRL1Union.DDLCTRL1.feedbackGain);
+//			XGpio_DiscreteWrite(&DDLCTRLInst, 1, DDLCTRL1Union.DDLCTRL_CH1Val);
+//		}
+//		else if(*rotary_AB == 2) {
+//			//printf("Rotary Enc -Right- rotary1_AB = %d\n\r", rotary2_AB);
+//			ddlFBGainFloat += ddlFbGainScale;
+//			if (ddlFBGainFloat >= 1.0) {
+//				ddlFBGainFloat = 1.0;
+//			}
+//			DDLCTRL1Union.DDLCTRL1.feedbackGain = (u16)(ddlFBGainFloat * (1 << (ddlCtrlBwidth-1)));
+//			printf("ddlFBGainFloat = %f,   feedbackGain = %d\n", ddlFBGainFloat, (int)DDLCTRL1Union.DDLCTRL1.feedbackGain);
+//			XGpio_DiscreteWrite(&DDLCTRLInst, 1, DDLCTRL1Union.DDLCTRL_CH1Val);
+//		}
+//		else {
+//		}
+//		*faderLvl = ddlFBGainFloat * 100;    // (???)
 
 //	} else if (*faderMuxSel == 4) {
 //		//printf("SSB Freq Ctrl: Fader MuxSel = %d\n\r",);
