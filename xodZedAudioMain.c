@@ -132,8 +132,8 @@ static bool			ssbCenterLock = 1;
 
 
 ///// DDL controls /////
-static float 		ddlWetDryScale = 0.023;
-static float 		ddlFbGainScale = 0.023;
+//static float 		ddlWetDryScale = 0.023;
+//static float 		ddlFbGainScale = 0.023;
 
 // *--------------------------------------------------------------------------------* //
 /////  __ssbModFreqCtrl__ SSB, DDS controls /////
@@ -202,8 +202,6 @@ static u8 rotary1_AB = 0;
 static u8 rotary2_AB = 0;
 static u8 rotary3_AB = 0;
 static u8 rotary4_AB = 0;
-
-
 
 static union ddlLengthCtrl_u ddlLengthCtrlData;
 static union ssbModFreqCtrl_u ssbModFreqCtrlData;
@@ -1406,12 +1404,6 @@ void rotary_select(u8 *rotary_AB, u8 *faderMuxSel, float *faderLvl)
 	} else if (*faderMuxSel == 1) {
 
 		//printf("DDL Length Ctrl: Fader2 MuxSel = %d\n\r",fader2MuxSel);
-		// DDL Length control {0 samples MIN : ? samples MAX}
-
-		//int delayLengthTmp2 = delayLengthTmp;
-		//ddlLengthShift = (int)log(delayLengthTmp2 >> 8);
-		//ddlLengthScale = ddlLengthScaleBase << ddlLengthShift;
-
 		if(*rotary_AB == 0) {
 			//printf("Rotary Enc -Left- rotary1_AB = %d\n\r",rotary2_AB);
 
@@ -1488,21 +1480,21 @@ void rotary_select(u8 *rotary_AB, u8 *faderMuxSel, float *faderLvl)
 		if(*rotary_AB == 0) {
 			//printf("Rotary Enc -Left- rotary2_AB = %d\n", rotary2_AB);
 
-			ddlTilt -= ssbTiltScale;
+			ddlTilt -= ddlTiltScale;
 			if (delayBase < 0) delayBase = 0;
 			if (delayBase > MAXDELAY) delayBase = MAXDELAY;
 
-			ddlxnTilt_update(&XodAXICtrl, ddlCenterLock, freqBase, &ssbTilt, 0);
+			ddlxnTilt_update(&XodAXICtrl, ddlCenterLock, delayBase, &ddlTilt, 0);
 
 		}
 		else if(*rotary_AB == 2) {
 			//printf("Rotary Enc -Left- rotary2_AB = %d\n", rotary2_AB);
 
-			freqBase += ssbTiltScale;
+			ddlTilt += ddlTiltScale;
 			if (delayBase < 0) delayBase = 0;
 			if (delayBase > MAXDELAY) delayBase = MAXDELAY;
 
-			ddlxnTilt_update(&XodAXICtrl, ddlCenterLock, freqBase, &ssbTilt, 0);
+			ddlxnTilt_update(&XodAXICtrl, ddlCenterLock, delayBase, &ddlTilt, 0);
 		}
 		else {
 		}
@@ -2677,7 +2669,7 @@ int main(void)
 
 	// Default Fader Target settings
 	// 0: MSTRVOL, 1: DDLLENGTH, 2: DDLMIX, 3: DDLFBGAIN, 4: SSBMODFreq1
-	fader1MuxSel = 4;
+	fader1MuxSel = 1;
 	fader2MuxSel = 1;
 	fader3MuxSel = 3;
 	fader4MuxSel = 0;
